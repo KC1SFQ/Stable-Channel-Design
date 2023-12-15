@@ -189,7 +189,7 @@ class UI(QFrame):
 
                 for i in range(len(out)):
                     if isnan(out[i])==True: out[i]=-999
-                    else: out[i]*(86400/2000) #tons/day
+                    else: out[i] = out[i]*(86400/2000) #tons/day
                 
                 return out 
 
