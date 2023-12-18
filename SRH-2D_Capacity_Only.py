@@ -208,7 +208,7 @@ class UI(QFrame):
                 return out
 
 
-            def C_brown(tau,Rbb,Vmag):
+            def Brown(tau,Rbb,Vmag):
                 """Brownlie Sand Transport Equation, cfs/ft"""
 
                 Sf = tau/(rho*g*Rbb)
@@ -279,7 +279,7 @@ class UI(QFrame):
             for i in range(len(shear)):
                 #var[i] = qb(shear[i])
                 if self.capacity.currentText() == "Brownlie - Sand Only": 
-                    var[i] = C_brown(shear[i],depths[i],vels[i])
+                    var[i] = Brown(shear[i],depths[i],vels[i])
                 else:
                     var[i] = MPM(shear[i])
                 wx = [i for i in var[i] if i != -999.0] #Removes values that are equal to -999.0
