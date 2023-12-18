@@ -63,7 +63,11 @@ class UI(QFrame):
                 dataset = list(f.keys())[0]
 
                 datalist = list(f[dataset])
-                print(datalist)
+                #print(datalist)
+                
+                self.shearbox.clear()
+                self.depthbox.clear()
+                self.velbox.clear()
 
                 self.shearbox.addItem('Select')
                 self.depthbox.addItem('Select')
@@ -180,7 +184,7 @@ class UI(QFrame):
             nu = 1.217*10**-5
 
                 ###MPM for D50 only####
-            def qb(tau): #bed load per unit width (cfs/ft)
+            def MPM(tau): #bed load per unit width (cfs/ft)
                 """MPM Bed Load Equation, cfs per Unit Width"""  
                 tau_star = tau/(rho*g*(Sg-1)*D50_nat/12)  
                 q_star = 3.97*((tau_star-0.0495)**1.5)
@@ -277,7 +281,7 @@ class UI(QFrame):
                 if self.capacity.currentText() == "Brownlie - Sand Only": 
                     var[i] = C_brown(shear[i],depths[i],vels[i])
                 else:
-                    var[i] = qb(shear[i])
+                    var[i] = MPM(shear[i])
                 wx = [i for i in var[i] if i != -999.0] #Removes values that are equal to -999.0
                 mins[i] = min(wx)
                 maxs[i] = max(wx)
