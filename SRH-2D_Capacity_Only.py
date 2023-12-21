@@ -12,13 +12,13 @@ from sys import argv as argv
 
 
 
-
-class UI(QFrame):
+#
+class UI_SedCAP(QFrame):
     def __init__(self):
-        super(UI,self).__init__()
+        super(UI_SedCAP,self).__init__()
 
         #load UI
-        uic.loadUi("Capacity_only.ui",self)
+        uic.loadUi("UI_Files/Capacity_only.ui",self)
 
         
 
@@ -45,6 +45,7 @@ class UI(QFrame):
         self.D16_nat1 = self.findChild(QLineEdit,"D16_nat")
         self.D50_nat1 = self.findChild(QLineEdit,"D50_nat")
         self.D84_nat1 = self.findChild(QLineEdit,"D84_nat")
+        self.Fs_sand = self.findChild(QLineEdit,"Fs")
         self.filename = "dummy"
         #self.button2 = self.findChild(QPushButton,"fishbaff")
         #self.button3 = self.findChild(QPushButton,"grav_pier")
@@ -63,8 +64,8 @@ class UI(QFrame):
                 dataset = list(f.keys())[0]
 
                 datalist = list(f[dataset])
-                #print(datalist)
-                
+                print(datalist)
+
                 self.shearbox.clear()
                 self.depthbox.clear()
                 self.velbox.clear()
@@ -103,9 +104,11 @@ class UI(QFrame):
 
         def onChange1(text): ##Enables certain input for sand vs. gravel beds 
             if self.capacity.currentText() == 'Brownlie - Sand Only' or text == 'Brownlie - Sand Only':
-                return self.D84_nat1.setEnabled(True), self.D16_nat1.setEnabled(True)
+                return self.D84_nat1.setEnabled(True), self.D16_nat1.setEnabled(True), self.Fs_sand.setEnabled(False)
+            elif self.capacity.currentText() == 'MPM - Gravel Only' or text == 'MPM - Gravel Only':
+                return self.D84_nat1.setEnabled(False), self.D16_nat1.setEnabled(False),self.Fs_sand.setEnabled(False)
             else:
-                return self.D84_nat1.setEnabled(False), self.D16_nat1.setEnabled(False)
+                return self.D84_nat1.setEnabled(False), self.D16_nat1.setEnabled(False),self.Fs_sand.setEnabled(True)
             
         def onChange2(text):
             if self.units.currentText() == "in" or text == "in":
@@ -150,7 +153,7 @@ class UI(QFrame):
         #filepath = str(QFileDialog.getExistingDirectory(self, "Select XMDF File"))
         #filepath = QFileDialog.setNameFilter(self,"hdf5 (*.h5)")
 
-        try:
+        #try:
 
             print(self.filename)
 
@@ -174,6 +177,7 @@ class UI(QFrame):
                 D16_nat = float(self.D16_nat1.text())/25.4 #in
 
 
+            Fsand =float(self.Fs_sand.text())
 
             #D50_nat = 1 #in
             #D84_nat = 0.1 #in
@@ -184,16 +188,58 @@ class UI(QFrame):
             nu = 1.217*10**-5
 
                 ###MPM for D50 only####
-            def MPM(tau): #bed load per unit width (cfs/ft)
-                """MPM Bed Load Equation, cfs per Unit Width"""  
+            def MPM(tau,D,V): #bed load per unit width (cfs/ft)
+                """MPM Bed Load Equation, cfs per Unit Width""" 
+
+                # l = len(tau)
+                
+
+                # gs = np.array([-999.0]*l)
+
+
+
+                # for i in range(l):
+
+                #     if tau[i] > 0:
+                #         u_star = sqrt(tau[i]/rho) 
+
+                #         Rs = u_star*(D84_nat/12)/nu
+                        
+                #         if Rs <= 5:
+                #             BCoeff = 5.5+2.5*log(Rs,exp(1))
+                #         elif Rs <= 70:
+                #             BCoeff = 0.297918+24.8666*log10(Rs)-22.9885*(log10(Rs)**2)+8.5199*(log10(Rs)**3)-1.10752*(log10(Rs)**4)
+                #         else:
+                #             BCoeff = 8.5
+
+
+                #         if D[i] > 0:   
+
+                #             fprime = (2.82843/(BCoeff-3.75+2.5*log(2*D[i]/(D84_nat/12),exp(1))))**2
+                            
+                            
+                #             rkr = sqrt(fprime/8)*(V[i]/u_star)
+
+                #             gs[i] = (((rkr**1.5)*tau[i]-(0.047*rho*g*(Sg-1)*D50_nat/12))/(0.25*(rho**(1/3))*(((Sg-1)/Sg)**(2/3))))**1.5  ##RAS MPM lb/sec
+                        
+                #out = gs
+
                 tau_star = tau/(rho*g*(Sg-1)*D50_nat/12)  
-                q_star = 3.97*((tau_star-0.0495)**1.5)
+                q_star = 3.97*((tau_star-0.0495)**1.5)    
                 out = q_star*(D50_nat/12)*sqrt(g*(Sg-1)*D50_nat/12) #(cfs/ft)
                 out = rho*g*Sg*out #lb/sec-ft
 
-                for i in range(len(out)):
-                    if isnan(out[i])==True: out[i]=-999
-                    else: out[i] = out[i]*(86400/2000) #tons/day
+                
+
+
+                for i in range(len(out)): 
+                    if isnan(out[i])==True: 
+                        out[i]=-999
+                    elif out[i]==-999: 
+                        out[i] = -999
+                    else:
+                        out[i] = out[i]*(86400/2000) #tons/day
+                        #print(out[i])
                 
                 return out 
 
@@ -228,6 +274,64 @@ class UI(QFrame):
                 return  out
             
 
+            def Wilk_Crowe(tau,fS):
+                """Wilcock-Crowe 2003 Surface Based transport Model"""
+                print('here')
+
+
+                d = D50_nat # grain size of interest 
+                dsm = D50_nat #median grain size 
+                tau_star = tau/(rho*g*(Sg-1)*D50_nat/12) 
+
+
+                
+                trm_star = 0.021+0.015*exp(-20*fS)
+                b = 0.67/(1+exp(1.5-d/dsm))
+                tri_star = trm_star*(d/dsm)**b
+
+
+                #print(b, tri_star)
+                u_star = np.array([-999.0]*len(tau))
+                W_star = np.array([-999.0]*len(tau))
+                qb = np.array([-999.0]*len(tau))
+                out = np.array([-999.0]*len(tau))
+                
+
+                for i in range(len(u_star)):
+                    try:
+                        u_star[i] = sqrt(tau[i]/rho)
+                        
+                        #Transport Function 
+                        if tau_star[i]/tri_star < 1.35:
+                            W_star[i] = 0.002*(tau_star[i]/tri_star)**7.5  
+                        else:
+                            W_star[i]= 14*(1+0.894/sqrt(tau_star[i]/tri_star)**4.5)
+
+                        qb[i]= (u_star[i]**3)*W_star[i]/((Sg-1)*g) #cfs/ft
+                        out[i] = rho*g*Sg*qb[i]*(86400/2000) #Tons/day-ft
+                        #print(out[i])
+                    except:
+                       out[i] = -999.0
+
+               
+                
+
+                
+               
+
+
+                # for i in range(len(tau)): 
+                #     if isnan(out[i])==True: 
+                #         out[i]=-999
+                #     elif out[i]==-999: 
+                #         out[i] = -999
+                #     else:
+                #         out[i] = out[i]*(86400/2000) #tons/day
+
+                #print(out)
+
+                return out
+
             
             comp = str(self.filename)
 
@@ -235,8 +339,10 @@ class UI(QFrame):
 
             if self.capacity.currentText() == "Brownlie - Sand Only": 
                 data_name = "Brownlie_tons_p_day_p_ft"
-            else:
+            elif self.capacity.currentText() == "MPM - Gravel Only": 
                 data_name = "MPM_tons_p_day_p_ft"
+            else:
+                data_name = "Wilcock_tons_p_day_p_ft"
 
 
             f = h5py.File(self.filename, "a")    
@@ -244,16 +350,6 @@ class UI(QFrame):
             sheartext = self.shearbox.currentText()
             veltext = self.velbox.currentText()
             depthstext = self.depthbox.currentText()
-
-            
-            #print(sheartext)
-            #print(veltext)
-            #print(depthstext)
-
-
-            # shear = np.array(f['Datasets/B_Stress_lb_p_ft2/Values'])
-            # depths = np.array(f['Datasets/Water_Depth_ft/Values'])
-            # vels = np.array(f['Datasets/Vel_Mag_ft_p_s/Values'])
 
             shear = np.array(f['Datasets/'+sheartext+'/Values'])
             depths = np.array(f['Datasets/'+depthstext+'/Values'])
@@ -276,16 +372,22 @@ class UI(QFrame):
             mins = [0]*len(shear)
             maxs = [0]*len(shear)
 
+
             for i in range(len(shear)):
                 #var[i] = qb(shear[i])
                 if self.capacity.currentText() == "Brownlie - Sand Only": 
                     var[i] = Brown(shear[i],depths[i],vels[i])
+                elif self.capacity.currentText() == "MPM - Gravel Only": 
+                    var[i] = MPM(shear[i],depths[i],vels[i])
                 else:
-                    var[i] = MPM(shear[i])
+                    var[i] = Wilk_Crowe(shear[i],Fsand)
+
+                
                 wx = [i for i in var[i] if i != -999.0] #Removes values that are equal to -999.0
+                #print(wx)
                 mins[i] = min(wx)
                 maxs[i] = max(wx)
-            print(var)
+            #print(var)
 
             
             #del f['Datasets/MP2']
@@ -310,12 +412,12 @@ class UI(QFrame):
                 
             #self.buttoncap.clicked.connect(computecap)
 
-        except:
-            out = "Error: Select File or Appropriate Variables"
-            self.comp_lab.setText(out)
+        # except:
+        #     out = "Error: Select File or Appropriate Variables"
+        #     self.comp_lab.setText(out)
 
 
   
 app = QApplication(argv)
-UIWindow = UI()
+UIWindow = UI_SedCAP()
 app.exec_()
