@@ -6,19 +6,23 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>541</width>
-    <height>694</height>
+    <width>538</width>
+    <height>535</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Frame</string>
+   <string>SRH-2D Sed Capacity</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../venv/env/Image_Files/Sed.png</normaloff>../../venv/env/Image_Files/Sed.png</iconset>
   </property>
   <widget class="QComboBox" name="cap_transport">
    <property name="geometry">
     <rect>
      <x>140</x>
      <y>50</y>
-     <width>111</width>
+     <width>191</width>
      <height>22</height>
     </rect>
    </property>
@@ -30,6 +34,11 @@
    <item>
     <property name="text">
      <string>MPM - Gravel Only</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Wilcock Crowe  - Gravel Bed</string>
     </property>
    </item>
   </widget>
@@ -198,7 +207,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>260</y>
+     <y>280</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -217,7 +226,7 @@
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>430</y>
+     <y>450</y>
      <width>311</width>
      <height>20</height>
     </rect>
@@ -266,7 +275,7 @@
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>460</y>
+     <y>480</y>
      <width>311</width>
      <height>20</height>
     </rect>
@@ -279,7 +288,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>290</y>
+     <y>310</y>
      <width>141</width>
      <height>22</height>
     </rect>
@@ -298,7 +307,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>290</y>
+     <y>310</y>
      <width>101</width>
      <height>21</height>
     </rect>
@@ -311,7 +320,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>350</y>
+     <y>370</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -324,7 +333,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>350</y>
+     <y>370</y>
      <width>141</width>
      <height>22</height>
     </rect>
@@ -334,7 +343,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>320</y>
+     <y>340</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -347,7 +356,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>320</y>
+     <y>340</y>
      <width>141</width>
      <height>22</height>
     </rect>
@@ -357,7 +366,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>380</y>
+     <y>400</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -373,7 +382,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>230</y>
+     <y>250</y>
      <width>221</width>
      <height>16</height>
     </rect>
@@ -386,7 +395,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>260</y>
+     <y>280</y>
      <width>101</width>
      <height>21</height>
     </rect>
@@ -399,7 +408,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>430</y>
+     <y>450</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -412,13 +421,55 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>460</y>
+     <y>480</y>
      <width>111</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
     <string>Dataset Output Name:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_21">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>210</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Bed Surface Sand Content</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="Fs">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>210</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>10</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_unit_4">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>210</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>%</string>
    </property>
   </widget>
  </widget>
